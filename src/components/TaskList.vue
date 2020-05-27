@@ -1,22 +1,41 @@
 <template>
-    <div class="container">
+         <div class="container">
+        <div class="add-task">
+            <input id="new-task" type="text" v-model="newTask">
+            <button type="button" @click="addTask(newTask)">Add New Task</button>
+        </div>
         <div class="task-zone">
             <div class="drop-zone" @drop="onDrop($event, 'todo')" @dragover.prevent @dragenter.prevent>
                 <h1>To-Do</h1>
                 <div class="drag-el" v-for="task in taskTodo" :key="task.id" draggable @dragstart="onStart($event, task)">
-                    {{ task.title }}
+                   <!-- {{ task.title }}-->
+                    <span v-if="editTask != task.id">{{ task.title }}</span>
+                    <input v-else class="edit-task" type="text" v-model="task.title">
+                    <button v-if="editTask != task.id" type="button" @click="onEdit(task)">Edit</button>
+                    <button v-else type="button" @click="editedTask(task)">Save</button>
+                    <button type="button" @click="deleteTask(task.id)">Delete</button>
                 </div>
             </div>
             <div class="drop-zone" @drop="onDrop($event, 'doing')" @dragover.prevent @dragenter.prevent>
                 <h1>Doing</h1>
                 <div class="drag-el" v-for="task in taskDoing" :key="task.id" draggable @dragstart="onStart($event, task)">
-                    {{ task.title }}
+                    <!-- {{ task.title }}-->
+                    <span v-if="editTask != task.id">{{ task.title }}</span>
+                    <input v-else class="edit-task" type="text" v-model="task.title">
+                    <button v-if="editTask != task.id" type="button" @click="onEdit(task)">Edit</button>
+                    <button v-else type="button" @click="editedTask(task)">Save</button>
+                    <button type="button" @click="deleteTask(task.id)">Delete</button>
                 </div>
             </div>
             <div class="drop-zone" @drop="onDrop($event, 'done')" @dragover.prevent @dragenter.prevent>
                 <h1>Done</h1>
                 <div class="drag-el" v-for="task in taskDone" :key="task.id" draggable @dragstart="onStart($event, task)">
-                    {{ task.title }}
+                    <!-- {{ task.title }}-->
+                    <span v-if="editTask != task.id">{{ task.title }}</span>
+                    <input v-else class="edit-task" type="text" v-model="task.title">
+                    <button v-if="editTask != task.id" type="button" @click="onEdit(task)">Edit</button>
+                    <button v-else type="button" @click="editedTask(task)">Save</button>
+                    <button type="button" @click="deleteTask(task.id)">Delete</button>
                 </div>
             </div>
         </div>
@@ -49,7 +68,9 @@ export default {
                     title: 'Item D',
                     status: 'done'
                 }
-            ]
+            ],
+            newTask: "",
+            editTask: "",
         }
     },
     computed:{
@@ -74,7 +95,24 @@ export default {
             const task = this.tasks.find(task => task.id == taskId)
             task.status = newStatus
         }
-    }
+    },
+    addTask(newTask){
+            let newId = (this.tasks.length + 1)
+            const newTitle = newTask
+            this.tasks.push({ id: newId, title: newTitle, status: 'todo' })
+            this.newTask = "";
+        },
+        onEdit(task){
+            this.editTask = task.id
+        },
+        editedTask(updateTask){
+            const task = this.tasks.find(task => task.id == updateTask.id)
+            task.title = updateTask.title
+            this.editTask = null
+        },
+        deleteTask(taskId){
+            this.tasks = this.tasks.filter(task => task.id != taskId)
+        }
 }
 </script>
 
@@ -100,5 +138,8 @@ export default {
     border-radius: 10px;
     margin: 5px auto;
     padding-top: 15px;
+}
+.add-task{
+    margin: 30px 0;
 }
 </style>
