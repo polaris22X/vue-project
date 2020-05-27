@@ -1,5 +1,5 @@
 <template>
-         <div class="container">
+    <div class="container">
         <div class="add-task">
             <input id="new-task" type="text" v-model="newTask">
             <button type="button" @click="addTask(newTask)">Add New Task</button>
@@ -7,10 +7,11 @@
         <div class="task-zone">
             <div class="drop-zone" @drop="onDrop($event, 'todo')" @dragover.prevent @dragenter.prevent>
                 <h1>To-Do</h1>
-                <div class="drag-el" v-for="task in taskTodo" :key="task.id" draggable @dragstart="onStart($event, task)">
-                   <!-- {{ task.title }}-->
+                <div class="drag-el" draggable @dragstart="onStart($event, task)" v-for="task in todoList" :key="task.id">
+                    <!-- {{ task.title }} -->
                     <span v-if="editTask != task.id">{{ task.title }}</span>
                     <input v-else class="edit-task" type="text" v-model="task.title">
+                    <br>
                     <button v-if="editTask != task.id" type="button" @click="onEdit(task)">Edit</button>
                     <button v-else type="button" @click="editedTask(task)">Save</button>
                     <button type="button" @click="deleteTask(task.id)">Delete</button>
@@ -18,10 +19,10 @@
             </div>
             <div class="drop-zone" @drop="onDrop($event, 'doing')" @dragover.prevent @dragenter.prevent>
                 <h1>Doing</h1>
-                <div class="drag-el" v-for="task in taskDoing" :key="task.id" draggable @dragstart="onStart($event, task)">
-                    <!-- {{ task.title }}-->
+                <div class="drag-el" draggable @dragstart="onStart($event, task)" v-for="task in doingList" :key="task.id">
                     <span v-if="editTask != task.id">{{ task.title }}</span>
                     <input v-else class="edit-task" type="text" v-model="task.title">
+                    <br>
                     <button v-if="editTask != task.id" type="button" @click="onEdit(task)">Edit</button>
                     <button v-else type="button" @click="editedTask(task)">Save</button>
                     <button type="button" @click="deleteTask(task.id)">Delete</button>
@@ -29,14 +30,14 @@
             </div>
             <div class="drop-zone" @drop="onDrop($event, 'done')" @dragover.prevent @dragenter.prevent>
                 <h1>Done</h1>
-                <div class="drag-el" v-for="task in taskDone" :key="task.id" draggable @dragstart="onStart($event, task)">
-                    <!-- {{ task.title }}-->
+                 <div class="drag-el" draggable @dragstart="onStart($event, task)" v-for="task in doneList" :key="task.id">
                     <span v-if="editTask != task.id">{{ task.title }}</span>
                     <input v-else class="edit-task" type="text" v-model="task.title">
+                    <br>
                     <button v-if="editTask != task.id" type="button" @click="onEdit(task)">Edit</button>
                     <button v-else type="button" @click="editedTask(task)">Save</button>
                     <button type="button" @click="deleteTask(task.id)">Delete</button>
-                </div>
+                 </div>
             </div>
         </div>
     </div>
@@ -44,7 +45,7 @@
 
 <script>
 export default {
-    name: 'TaskList',
+    name:'TaskList',
     data(){
         return{
             tasks:[
@@ -56,17 +57,17 @@ export default {
                 {
                     id: 2,
                     title: 'Item B',
-                    status: 'doing'
+                    status: 'todo'
                 },
                 {
                     id: 3,
                     title: 'Item C',
-                    status: 'doing'
+                    status: 'todo'
                 },
                 {
                     id: 4,
                     title: 'Item D',
-                    status: 'done'
+                    status: 'doing'
                 }
             ],
             newTask: "",
@@ -74,32 +75,30 @@ export default {
         }
     },
     computed:{
-        taskTodo(){
-            return this.tasks.filter(task => task.status === 'todo')
+        todoList(){
+            return this.tasks.filter(task => task.status == "todo")
         },
-        taskDoing(){
-            return this.tasks.filter(task => task.status === 'doing')
+        doingList(){
+            return this.tasks.filter(task => task.status == "doing")
         },
-        taskDone(){
-            return this.tasks.filter(task => task.status === 'done')
+        doneList(){
+            return this.tasks.filter(task => task.status == "done")
         }
     },
     methods:{
         onStart(e, task){
-            e.dataTransfer.dropEffect = 'move'
-            e.dataTransfer.effectAllowed = 'move'
+            e.dataTransfer.dropEffect = "move"
+            e.dataTransfer.effectAllowed = "move"
             e.dataTransfer.setData('taskId', task.id)
         },
         onDrop(e, newStatus){
             const taskId = e.dataTransfer.getData('taskId')
             const task = this.tasks.find(task => task.id == taskId)
-            task.status = newStatus
-        }
-    },
-    addTask(newTask){
-            let newId = (this.tasks.length + 1)
-            const newTitle = newTask
-            this.tasks.push({ id: newId, title: newTitle, status: 'todo' })
+            task.status = newStatus 
+        },
+        addTask(newTask){
+            let newId = this.tasks.length + 1
+            this.tasks.push({id: newId, title: newTask, status: 'todo'})
             this.newTask = "";
         },
         onEdit(task){
@@ -108,13 +107,14 @@ export default {
         editedTask(updateTask){
             const task = this.tasks.find(task => task.id == updateTask.id)
             task.title = updateTask.title
-            this.editTask = null
+            this.editTask = ""
         },
         deleteTask(taskId){
             this.tasks = this.tasks.filter(task => task.id != taskId)
         }
+    }
 }
-</script>
+</script>>
 
 <style scoped>
 .container{
@@ -125,7 +125,7 @@ export default {
     justify-content: space-around;
 }
 .drop-zone{
-    border: 1px solid black;
+    border: 1px solid black ;
     border-radius: 10px;
     width: 250px;
     height: 400px;
